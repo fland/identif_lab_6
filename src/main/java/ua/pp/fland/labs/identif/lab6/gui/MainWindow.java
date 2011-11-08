@@ -6,23 +6,27 @@ import ua.pp.fland.labs.identif.lab6.gui.tools.BoxLayoutUtils;
 import ua.pp.fland.labs.identif.lab6.gui.tools.ComponentUtils;
 import ua.pp.fland.labs.identif.lab6.gui.tools.GUITools;
 import ua.pp.fland.labs.identif.lab6.gui.tools.StandardBordersSizes;
+import ua.pp.fland.labs.identif.lab6.model.FiniteDifferenceMethod;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.Dimension;
+import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
  * @author Maxim Bondarenko
- * @version 1.0 9/29/11
+ * @version 1.0 11/7/11
  */
 
 public class MainWindow {
     private static final Logger log = LoggerFactory.getLogger(MainWindow.class);
 
-    private final static ResourceBundle bundle = ResourceBundle.getBundle("lab4");
+    private final static ResourceBundle bundle = ResourceBundle.getBundle("lab6");
 
     private final static Dimension MAIN_FRAME_SIZE = new Dimension(Integer.parseInt(bundle.getString("window.width")),
             Integer.parseInt(bundle.getString("window.height")));
@@ -49,7 +53,7 @@ public class MainWindow {
     private final JTextField ladleCountDeviationInput;
 
     public MainWindow() {
-        mainFrame = new JFrame("Lab 4");
+        mainFrame = new JFrame("Lab 6");
         mainFrame.setSize(MAIN_FRAME_SIZE);
         mainFrame.setResizable(false);
         mainFrame.setLocationRelativeTo(null);
@@ -100,7 +104,31 @@ public class MainWindow {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 log.debug("Process btn pressed");
+                Map<Double, Double> xStartTemp = new HashMap<Double, Double>();
+//                BigDecimal temp = new BigDecimal(-2.705882353);
 
+                double xCoeff = -2.705882353d;
+                double freeTerm = 3.905882353d;
+                double startX = 0.16d;
+                double endX = 1d;
+                final double xStep = 0.01d;
+                for(double currX = startX; currX <=endX; currX = currX + xStep){
+                    xStartTemp.put(currX, (xCoeff * currX) + freeTerm);
+                }
+
+                xCoeff = 0.066666667d;
+                freeTerm = 1.2d;
+                startX = 0d;
+                endX = 0.15d;
+                for(double currX = startX; currX <=endX; currX = currX + xStep){
+                    xStartTemp.put(currX, (xCoeff * currX) + freeTerm);
+                }
+
+                log.debug("Start data forming finished");
+                final double timeStep = 0.1d;
+                FiniteDifferenceMethod finiteDifferenceMethod = new FiniteDifferenceMethod(xStartTemp, xStep, timeStep,
+                        3.5d);
+                finiteDifferenceMethod.calculate();
             }
         });
 
