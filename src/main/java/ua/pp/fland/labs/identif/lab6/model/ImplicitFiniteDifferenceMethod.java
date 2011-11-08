@@ -12,9 +12,9 @@ import java.util.Map;
  * @version 1.0 11/7/11
  */
 
-public class FiniteDifferenceMethod {
+public class ImplicitFiniteDifferenceMethod {
 
-    private static final Logger log = LoggerFactory.getLogger(FiniteDifferenceMethod.class);
+    private static final Logger log = LoggerFactory.getLogger(ImplicitFiniteDifferenceMethod.class);
 
     private final static double DOUBLE_PRECISION = 0.0001;
 
@@ -28,7 +28,7 @@ public class FiniteDifferenceMethod {
 
     private final double xi;
 
-    public FiniteDifferenceMethod(Map<Double, Double> xStartTemp, double xStep, double timeStep, double xi) {
+    public ImplicitFiniteDifferenceMethod(Map<Double, Double> xStartTemp, double xStep, double timeStep, double xi) {
         this.xStartTemp = xStartTemp;
         this.xStep = xStep;
         this.timeStep = timeStep;

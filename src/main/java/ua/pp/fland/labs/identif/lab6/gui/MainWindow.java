@@ -6,14 +6,13 @@ import ua.pp.fland.labs.identif.lab6.gui.tools.BoxLayoutUtils;
 import ua.pp.fland.labs.identif.lab6.gui.tools.ComponentUtils;
 import ua.pp.fland.labs.identif.lab6.gui.tools.GUITools;
 import ua.pp.fland.labs.identif.lab6.gui.tools.StandardBordersSizes;
-import ua.pp.fland.labs.identif.lab6.model.FiniteDifferenceMethod;
+import ua.pp.fland.labs.identif.lab6.model.ImplicitFiniteDifferenceMethod;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Dimension;
-import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -126,9 +125,9 @@ public class MainWindow {
 
                 log.debug("Start data forming finished");
                 final double timeStep = 0.1d;
-                FiniteDifferenceMethod finiteDifferenceMethod = new FiniteDifferenceMethod(xStartTemp, xStep, timeStep,
+                ImplicitFiniteDifferenceMethod implicitFiniteDifferenceMethod = new ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep,
                         3.5d);
-                finiteDifferenceMethod.calculate();
+                implicitFiniteDifferenceMethod.calculate();
             }
         });
 
