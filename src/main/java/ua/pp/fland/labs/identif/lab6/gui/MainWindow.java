@@ -13,6 +13,8 @@ import javax.swing.border.EmptyBorder;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Dimension;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -103,8 +105,13 @@ public class MainWindow {
             @Override
             public void actionPerformed(ActionEvent ae) {
                 log.debug("Process btn pressed");
-                Map<Double, Double> xStartTemp = new HashMap<Double, Double>();
-//                BigDecimal temp = new BigDecimal(-2.705882353);
+                Map<BigDecimal, Double> xStartTemp = new HashMap<BigDecimal, Double>();
+                /*BigDecimal temp = new BigDecimal(-2.705882353);
+                log.debug(temp.toPlainString());
+                temp = temp.setScale(3, RoundingMode.UP);
+                log.debug(temp.toPlainString());*/
+
+                final int xValuesScale = 2;
 
                 double xCoeff = -2.705882353d;
                 double freeTerm = 3.905882353d;
@@ -112,7 +119,8 @@ public class MainWindow {
                 double endX = 1d;
                 final double xStep = 0.01d;
                 for(double currX = startX; currX <=endX; currX = currX + xStep){
-                    xStartTemp.put(currX, (xCoeff * currX) + freeTerm);
+                    BigDecimal temp = new BigDecimal(currX);
+                    xStartTemp.put(temp.setScale(xValuesScale, RoundingMode.HALF_UP), (xCoeff * currX) + freeTerm);
                 }
 
                 xCoeff = 0.066666667d;
@@ -120,14 +128,15 @@ public class MainWindow {
                 startX = 0d;
                 endX = 0.15d;
                 for(double currX = startX; currX <=endX; currX = currX + xStep){
-                    xStartTemp.put(currX, (xCoeff * currX) + freeTerm);
+                    BigDecimal temp = new BigDecimal(currX);
+                    xStartTemp.put(temp.setScale(xValuesScale, RoundingMode.HALF_UP), (xCoeff * currX) + freeTerm);
                 }
 
                 log.debug("Start data forming finished");
-                final double timeStep = 0.1d;
-                ImplicitFiniteDifferenceMethod implicitFiniteDifferenceMethod = new ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep,
-                        3.5d);
-                implicitFiniteDifferenceMethod.calculate();
+                final double timeStep = 0.01d;
+                ImplicitFiniteDifferenceMethod implicitFiniteDifferenceMethod = new
+                        ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep, 3.5d, xValuesScale);
+                Map<Double, Map<BigDecimal, Double>> calculatedTemp = implicitFiniteDifferenceMethod.calculate();
             }
         });
 

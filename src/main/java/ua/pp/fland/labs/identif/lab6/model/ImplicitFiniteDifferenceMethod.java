@@ -3,6 +3,8 @@ package ua.pp.fland.labs.identif.lab6.model;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +20,7 @@ public class ImplicitFiniteDifferenceMethod {
 
     private final static double DOUBLE_PRECISION = 0.0001;
 
-    private final Map<Double, Double> xStartTemp;
+    private final Map<BigDecimal, Double> xStartTemp;
 
     private final double xStep;
 
@@ -28,23 +30,39 @@ public class ImplicitFiniteDifferenceMethod {
 
     private final double xi;
 
-    public ImplicitFiniteDifferenceMethod(Map<Double, Double> xStartTemp, double xStep, double timeStep, double xi) {
+    private final int xValuesScale;
+
+    public ImplicitFiniteDifferenceMethod(Map<BigDecimal, Double> xStartTemp, double xStep, double timeStep,
+                                          double xi, int xValuesScale) {
         this.xStartTemp = xStartTemp;
         this.xStep = xStep;
         this.timeStep = timeStep;
         this.xi = xi;
-        n = Math.round(Collections.max(xStartTemp.keySet()) / xStep);
+        this.xValuesScale = xValuesScale;
+        n = Math.round(Collections.max(xStartTemp.keySet()).doubleValue() / xStep);
     }
 
-    public void calculate() {
-        Map<Double, Map<Double, Double>> calculatedTemp;
-        calculatedTemp = new HashMap<Double, Map<Double, Double>>();
+    public Map<Double, Map<BigDecimal, Double>> calculate() {
+        Map<Double, Map<BigDecimal, Double>> calculatedTemp;
+        calculatedTemp = new HashMap<Double, Map<BigDecimal, Double>>();
 
-        Map<Double, Double> timeTemp = new HashMap<Double, Double>(getTempAtTime(xStartTemp, 1.2f, xi));
+        double startTimeSec = 0d;
+        double currTimeSec = startTimeSec;
+        double endTimeSec = 5d;
+        Map<BigDecimal, Double> timeTemp = new HashMap<BigDecimal, Double>(getTempAtTime(xStartTemp, 1.2f, xi));
+        calculatedTemp.put(currTimeSec, timeTemp);
+        currTimeSec = currTimeSec + timeStep;
+        for (; currTimeSec < endTimeSec; currTimeSec = currTimeSec + timeStep) {
+            log.debug("Curr time: " + currTimeSec);
+            timeTemp = new HashMap<BigDecimal, Double>(getTempAtTime(timeTemp, 1.2f, xi));
+            calculatedTemp.put(currTimeSec, timeTemp);
+        }
+
+        return calculatedTemp;
     }
 
-    private Map<Double, Double> getTempAtTime(Map<Double, Double> prevTimeXValues, double u0j, double xi) {
-        Map<Double, Double> res = new HashMap<Double, Double>();
+    private Map<BigDecimal, Double> getTempAtTime(Map<BigDecimal, Double> prevTimeXValues, double u0j, double xi) {
+        Map<BigDecimal, Double> res = new HashMap<BigDecimal, Double>();
 
         double startChi = 0;
         double startNu = u0j;
@@ -56,22 +74,28 @@ public class ImplicitFiniteDifferenceMethod {
 
         currX = currX + xStep;
         for (long i = 2; i < n; i++) {
+            /*log.debug("Curr i: " + i);
+            log.debug("Curr x: " + currX);*/
             DirectFlowData prevDirectFlowData = directFlowData.get(i - 1);
             double chi = calculateChi(lambda, prevDirectFlowData.getChi());
-            double nu = calculateNu(prevTimeXValues.get(currX), prevDirectFlowData.getNu(), lambda,
-                            prevDirectFlowData.getChi());
+            BigDecimal currXBigDecimal = new BigDecimal(currX);
+            double nu = calculateNu(prevTimeXValues.get(currXBigDecimal.setScale(xValuesScale, RoundingMode.HALF_UP)),
+                    prevDirectFlowData.getNu(), lambda, prevDirectFlowData.getChi());
             directFlowData.put(i, new DirectFlowData(chi, nu));
             currX = currX + xStep;
         }
 
-        Double lastX = currX;
-        res.put(lastX, xi);
+        BigDecimal lastX = new BigDecimal(currX);
+        res.put(lastX.setScale(xValuesScale, RoundingMode.HALF_UP), xi);
         currX = currX - xStep;
-        for(long i = n; i > 1; i--){
-            log.debug("Curr i: " + i);
+        for (long i = n; i > 1; i--) {
+//            log.debug("Curr i: " + i);
             DirectFlowData prevDirectFlowData = directFlowData.get(i - 1);
-            double temp = prevDirectFlowData.getChi() * res.get(currX + xStep) + prevDirectFlowData.getNu();
-            res.put(currX, temp);
+            BigDecimal nextCurrXBigDecimal = new BigDecimal(currX + xStep);
+            double temp = prevDirectFlowData.getChi() *
+                    res.get(nextCurrXBigDecimal.setScale(xValuesScale, RoundingMode.HALF_UP)) + prevDirectFlowData.getNu();
+            BigDecimal currXBigDecimal = new BigDecimal(currX);
+            res.put(currXBigDecimal.setScale(xValuesScale, RoundingMode.HALF_UP), temp);
             currX = currX - xStep;
         }
 
