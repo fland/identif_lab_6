@@ -33,25 +33,25 @@ public class MainWindow {
             Integer.parseInt(bundle.getString("window.height")));
 
     private final static String PROCESS_BTN_TEXT = "Process";
-    private final static String PROCESS_WEIGHTED_BTN_TEXT = "Process Weighted";
     private final static String EXIT_BTN_TEXT = "Exit";
 
-    private final static String CAST_IRON_START_TEMPERATURE_LABEL = "Cast iron start temperature, C: ";
-    private final static String CAST_IRON_MASS_DEVIATION_LABEL = "Cast iron mass deviation(tons): ";
-    private final static String TIME_TRANSPORT_DEVIATION = "Transport time deviation:";
-    private final static String TRANSPORT_TIME_TO_SLUG_REMOVAL_DEVIATION_LABEL = "To slug removal department(min): ";
-    private final static String TRANSPORT_TIME_TO_MIXER_DEVIATION_LABEL = "To mixer department(min): ";
-    private final static String DESULFURATION_COUNT = "Desulfurations count: ";
-    private final static String LADLES_COUNT_DEVIATION = "Ladle count deviation: ";
+    private final static String X_START_VALUE_LABEL_TEXT = "x start value: ";
+    private final static String X_END_VALUE_LABEL_TEXT = "x end value: ";
+    private final static String X_COEFF_LABEL_TEXT = "x coeff: ";
+    private final static String FREE_TERM_LABEL_TEXT = "Free term: ";
+    private final static String FIRST_EQUATION_LABEL_TEXT = "First equation: ";
+    private final static String SECOND_EQUATION_LABEL_TEXT = "Second equation: ";
 
     private final JFrame mainFrame;
 
-    private final JTextField castIronStartTemperatureInput;
-    private final JTextField castIronMassDeviationInput;
-    private final JTextField slugRemovalDepTransTimeDeviationInput;
-    private final JTextField mixerDepTransTimeDeviationInput;
-    private final JTextField desulfurationCountInput;
-    private final JTextField ladleCountDeviationInput;
+    private final JTextField firstEqXStartValueInput;
+    private final JTextField firstEqXEndValueInput;
+    private final JTextField firstEqXCoeffInput;
+    private final JTextField firstEqFreeTermInput;
+    private final JTextField secondEqXStartValueInput;
+    private final JTextField secondEqXEndValueInput;
+    private final JTextField secondEqXCoeffInput;
+    private final JTextField secondEqFreeTermInput;
 
     public MainWindow() {
         mainFrame = new JFrame("Lab 6");
@@ -60,29 +60,37 @@ public class MainWindow {
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        castIronMassDeviationInput = new JTextField("10");
-        GUITools.fixTextFieldSize(castIronMassDeviationInput);
-        castIronMassDeviationInput.setCaretPosition(0);
+        firstEqXEndValueInput = new JTextField("0.15");
+        GUITools.fixTextFieldSize(firstEqXEndValueInput);
+        firstEqXEndValueInput.setCaretPosition(0);
 
-        slugRemovalDepTransTimeDeviationInput = new JTextField("60");
-        GUITools.fixTextFieldSize(slugRemovalDepTransTimeDeviationInput);
-        slugRemovalDepTransTimeDeviationInput.setCaretPosition(0);
+        firstEqXCoeffInput = new JTextField("0.066666667");
+        GUITools.fixTextFieldSize(firstEqXCoeffInput);
+        firstEqXCoeffInput.setCaretPosition(0);
 
-        mixerDepTransTimeDeviationInput = new JTextField("60");
-        GUITools.fixTextFieldSize(mixerDepTransTimeDeviationInput);
-        mixerDepTransTimeDeviationInput.setCaretPosition(0);
+        firstEqFreeTermInput = new JTextField("1.2");
+        GUITools.fixTextFieldSize(firstEqFreeTermInput);
+        firstEqFreeTermInput.setCaretPosition(0);
 
-        desulfurationCountInput = new JTextField("1");
-        GUITools.fixTextFieldSize(desulfurationCountInput);
-        desulfurationCountInput.setCaretPosition(0);
+        firstEqXStartValueInput = new JTextField("0.0");
+        GUITools.fixTextFieldSize(firstEqXStartValueInput);
+        firstEqXStartValueInput.setCaretPosition(0);
 
-        ladleCountDeviationInput = new JTextField("0");
-        GUITools.fixTextFieldSize(ladleCountDeviationInput);
-        ladleCountDeviationInput.setCaretPosition(0);
+        secondEqXEndValueInput = new JTextField("0.16");
+        GUITools.fixTextFieldSize(secondEqXEndValueInput);
+        secondEqXEndValueInput.setCaretPosition(0);
 
-        castIronStartTemperatureInput = new JTextField("1450");
-        GUITools.fixTextFieldSize(castIronStartTemperatureInput);
-        castIronStartTemperatureInput.setCaretPosition(0);
+        secondEqXCoeffInput = new JTextField("-2.705882353");
+        GUITools.fixTextFieldSize(secondEqXCoeffInput);
+        secondEqXCoeffInput.setCaretPosition(0);
+
+        secondEqFreeTermInput = new JTextField("3.905882353");
+        GUITools.fixTextFieldSize(secondEqFreeTermInput);
+        secondEqFreeTermInput.setCaretPosition(0);
+
+        secondEqXStartValueInput = new JTextField("1.0");
+        GUITools.fixTextFieldSize(secondEqXStartValueInput);
+        secondEqXStartValueInput.setCaretPosition(0);
 
         final JPanel mainPanel = BoxLayoutUtils.createVerticalPanel();
         mainPanel.setBorder(new EmptyBorder(StandardBordersSizes.MAIN_BORDER.getValue()));
@@ -106,11 +114,6 @@ public class MainWindow {
             public void actionPerformed(ActionEvent ae) {
                 log.debug("Process btn pressed");
                 Map<BigDecimal, Double> xStartTemp = new HashMap<BigDecimal, Double>();
-                /*BigDecimal temp = new BigDecimal(-2.705882353);
-                log.debug(temp.toPlainString());
-                temp = temp.setScale(3, RoundingMode.UP);
-                log.debug(temp.toPlainString());*/
-
                 final int xValuesScale = 2;
 
                 double xCoeff = -2.705882353d;
@@ -137,6 +140,8 @@ public class MainWindow {
                 ImplicitFiniteDifferenceMethod implicitFiniteDifferenceMethod = new
                         ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep, 3.5d, xValuesScale);
                 Map<Double, Map<BigDecimal, Double>> calculatedTemp = implicitFiniteDifferenceMethod.calculate();
+
+
             }
         });
 
@@ -164,62 +169,84 @@ public class MainWindow {
         JPanel inputsPanel = BoxLayoutUtils.createVerticalPanel();
 
         JPanel tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
-        JLabel castIronStartTempLabel = new JLabel(CAST_IRON_START_TEMPERATURE_LABEL);
-        tempHorPanel.add(castIronStartTempLabel);
-        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
-        tempHorPanel.add(castIronStartTemperatureInput);
-        inputsPanel.add(tempHorPanel);
-        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
-
-        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
-        JLabel castIronMassDeviationLabel = new JLabel(CAST_IRON_MASS_DEVIATION_LABEL);
-        tempHorPanel.add(castIronMassDeviationLabel);
-        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
-        tempHorPanel.add(castIronMassDeviationInput);
-        inputsPanel.add(tempHorPanel);
-        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
-
-        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
-        JLabel transportTimeDeviationLabel = new JLabel(TIME_TRANSPORT_DEVIATION);
-        tempHorPanel.add(transportTimeDeviationLabel);
+        JLabel firstEquationLabel = new JLabel(FIRST_EQUATION_LABEL_TEXT);
+        tempHorPanel.add(firstEquationLabel);
         inputsPanel.add(tempHorPanel);
         inputsPanel.add(Box.createRigidArea(StandardDimension.VER_HALF_RIGID_AREA.getValue()));
 
         tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
-        JLabel slugRemovalDepDevLabel = new JLabel(TRANSPORT_TIME_TO_SLUG_REMOVAL_DEVIATION_LABEL);
-        tempHorPanel.add(slugRemovalDepDevLabel);
+        JLabel firstEqXStartValueLabel = new JLabel(X_START_VALUE_LABEL_TEXT);
+        tempHorPanel.add(firstEqXStartValueLabel);
         tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
-        tempHorPanel.add(slugRemovalDepTransTimeDeviationInput);
+        tempHorPanel.add(firstEqXStartValueInput);
+        inputsPanel.add(tempHorPanel);
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
+
+        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
+        JLabel firstEqXEndValueLabel = new JLabel(X_END_VALUE_LABEL_TEXT);
+        tempHorPanel.add(firstEqXEndValueLabel);
+        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
+        tempHorPanel.add(firstEqXEndValueInput);
+        inputsPanel.add(tempHorPanel);
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
+
+        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
+        JLabel firstEqXCoeffLabel = new JLabel(X_COEFF_LABEL_TEXT);
+        tempHorPanel.add(firstEqXCoeffLabel);
+        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
+        tempHorPanel.add(firstEqXCoeffInput);
         inputsPanel.add(tempHorPanel);
         inputsPanel.add(Box.createRigidArea(StandardDimension.VER_HALF_RIGID_AREA.getValue()));
 
         tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
-        JLabel mixerDepDevLabel = new JLabel(TRANSPORT_TIME_TO_MIXER_DEVIATION_LABEL);
-        tempHorPanel.add(mixerDepDevLabel);
+        JLabel firstEqFreeTermLabel = new JLabel(FREE_TERM_LABEL_TEXT);
+        tempHorPanel.add(firstEqFreeTermLabel);
         tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
-        tempHorPanel.add(mixerDepTransTimeDeviationInput);
+        tempHorPanel.add(firstEqFreeTermInput);
         inputsPanel.add(tempHorPanel);
         inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
+
         inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
 
         tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
-        JLabel desulfurationCountLabel = new JLabel(DESULFURATION_COUNT);
-        tempHorPanel.add(desulfurationCountLabel);
+        JLabel secondEquationLabel = new JLabel(SECOND_EQUATION_LABEL_TEXT);
+        tempHorPanel.add(secondEquationLabel);
+        inputsPanel.add(tempHorPanel);
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_HALF_RIGID_AREA.getValue()));
+
+        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
+        JLabel secondEqXStartValueLabel = new JLabel(X_START_VALUE_LABEL_TEXT);
+        tempHorPanel.add(secondEqXStartValueLabel);
         tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
-        tempHorPanel.add(desulfurationCountInput);
+        tempHorPanel.add(secondEqXStartValueInput);
         inputsPanel.add(tempHorPanel);
         inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
 
         tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
-        JLabel ladlesCountDeviationLabel = new JLabel(LADLES_COUNT_DEVIATION);
-        tempHorPanel.add(ladlesCountDeviationLabel);
+        JLabel secondEqXEndValueLabel = new JLabel(X_END_VALUE_LABEL_TEXT);
+        tempHorPanel.add(secondEqXEndValueLabel);
         tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
-        tempHorPanel.add(ladleCountDeviationInput);
+        tempHorPanel.add(secondEqXEndValueInput);
         inputsPanel.add(tempHorPanel);
         inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
 
-        GUITools.makeSameSize(castIronMassDeviationLabel, transportTimeDeviationLabel, slugRemovalDepDevLabel,
-                mixerDepDevLabel, desulfurationCountLabel, ladlesCountDeviationLabel, castIronStartTempLabel);
+        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
+        JLabel secondEqXCoeffLabel = new JLabel(X_COEFF_LABEL_TEXT);
+        tempHorPanel.add(secondEqXCoeffLabel);
+        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
+        tempHorPanel.add(secondEqXCoeffInput);
+        inputsPanel.add(tempHorPanel);
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_HALF_RIGID_AREA.getValue()));
+
+        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
+        JLabel secondEqFreeTermLabel = new JLabel(FREE_TERM_LABEL_TEXT);
+        tempHorPanel.add(secondEqFreeTermLabel);
+        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
+        tempHorPanel.add(secondEqFreeTermInput);
+        inputsPanel.add(tempHorPanel);
+
+        GUITools.makeSameSize(firstEqXEndValueLabel, firstEqXCoeffLabel, firstEqFreeTermLabel, firstEqXStartValueLabel,
+                secondEqFreeTermLabel, secondEqXCoeffLabel, secondEqXEndValueLabel, secondEqXStartValueLabel);
 
         return inputsPanel;
     }
