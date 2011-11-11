@@ -48,6 +48,8 @@ public class MainWindow {
     private final static String SECOND_EQUATION_LABEL_TEXT = "Second equation: ";
     private final static String X_0_VALUE_LABEL_TEXT = "x0: ";
     private final static String X_I_VALUE_LABEL_TEXT = "xi: ";
+    private final static String TIME_STEP_LABEL_TEXT = "Time step: ";
+    private final static String END_TIME_LABEL_TEXT = "End time: ";
 
     private final JFrame mainFrame;
 
@@ -342,9 +344,27 @@ public class MainWindow {
         tempHorPanel.add(xiValueInput);
         inputsPanel.add(tempHorPanel);
 
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
+
+        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
+        JLabel timeStepLabel = new JLabel(TIME_STEP_LABEL_TEXT);
+        tempHorPanel.add(timeStepLabel);
+        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
+        tempHorPanel.add(timeStepInput);
+        inputsPanel.add(tempHorPanel);
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_HALF_RIGID_AREA.getValue()));
+
+        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
+        JLabel endTimeLabel = new JLabel(END_TIME_LABEL_TEXT);
+        tempHorPanel.add(endTimeLabel);
+        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
+        tempHorPanel.add(endTimeInput);
+        inputsPanel.add(tempHorPanel);
+
         GUITools.makeSameSize(firstEqXEndValueLabel, firstEqXCoeffLabel, firstEqFreeTermLabel, firstEqXStartValueLabel,
                 secondEqFreeTermLabel, secondEqXCoeffLabel, secondEqXEndValueLabel, secondEqXStartValueLabel,
-                x0ValueLabel, xiValueLabel);
+                x0ValueLabel, xiValueLabel, timeStepLabel, endTimeLabel);
 
         return inputsPanel;
     }
