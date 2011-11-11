@@ -1,4 +1,4 @@
-package ua.pp.fland.labs.identif.lab6.model;
+package ua.pp.fland.labs.identif.lab6.model.beans;
 
 /**
  * @author Maxim Bondarenko

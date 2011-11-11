@@ -7,12 +7,17 @@ import ua.pp.fland.labs.identif.lab6.gui.tools.ComponentUtils;
 import ua.pp.fland.labs.identif.lab6.gui.tools.GUITools;
 import ua.pp.fland.labs.identif.lab6.gui.tools.StandardBordersSizes;
 import ua.pp.fland.labs.identif.lab6.model.ImplicitFiniteDifferenceMethod;
+import ua.pp.fland.labs.identif.lab6.model.storage.CsvTimeTemperatureStorer;
+import ua.pp.fland.labs.identif.lab6.model.storage.TimeTemperatureStorer;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.Dimension;
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.HashMap;
@@ -41,6 +46,8 @@ public class MainWindow {
     private final static String FREE_TERM_LABEL_TEXT = "Free term: ";
     private final static String FIRST_EQUATION_LABEL_TEXT = "First equation: ";
     private final static String SECOND_EQUATION_LABEL_TEXT = "Second equation: ";
+    private final static String X_0_VALUE_LABEL_TEXT = "x0: ";
+    private final static String X_I_VALUE_LABEL_TEXT = "xi: ";
 
     private final JFrame mainFrame;
 
@@ -52,6 +59,8 @@ public class MainWindow {
     private final JTextField secondEqXEndValueInput;
     private final JTextField secondEqXCoeffInput;
     private final JTextField secondEqFreeTermInput;
+    private final JTextField x0ValueInput;
+    private final JTextField xiValueInput;
 
     public MainWindow() {
         mainFrame = new JFrame("Lab 6");
@@ -76,7 +85,7 @@ public class MainWindow {
         GUITools.fixTextFieldSize(firstEqXStartValueInput);
         firstEqXStartValueInput.setCaretPosition(0);
 
-        secondEqXEndValueInput = new JTextField("0.16");
+        secondEqXEndValueInput = new JTextField("1.0");
         GUITools.fixTextFieldSize(secondEqXEndValueInput);
         secondEqXEndValueInput.setCaretPosition(0);
 
@@ -88,9 +97,17 @@ public class MainWindow {
         GUITools.fixTextFieldSize(secondEqFreeTermInput);
         secondEqFreeTermInput.setCaretPosition(0);
 
-        secondEqXStartValueInput = new JTextField("1.0");
+        secondEqXStartValueInput = new JTextField("0.16");
         GUITools.fixTextFieldSize(secondEqXStartValueInput);
         secondEqXStartValueInput.setCaretPosition(0);
+
+        x0ValueInput = new JTextField("1.2");
+        GUITools.fixTextFieldSize(x0ValueInput);
+        x0ValueInput.setCaretPosition(0);
+
+        xiValueInput = new JTextField("3.5");
+        GUITools.fixTextFieldSize(xiValueInput);
+        xiValueInput.setCaretPosition(0);
 
         final JPanel mainPanel = BoxLayoutUtils.createVerticalPanel();
         mainPanel.setBorder(new EmptyBorder(StandardBordersSizes.MAIN_BORDER.getValue()));
@@ -116,32 +133,83 @@ public class MainWindow {
                 Map<BigDecimal, Double> xStartTemp = new HashMap<BigDecimal, Double>();
                 final int xValuesScale = 2;
 
-                double xCoeff = -2.705882353d;
+                /*double xCoeff = -2.705882353d;
                 double freeTerm = 3.905882353d;
                 double startX = 0.16d;
-                double endX = 1d;
-                final double xStep = 0.01d;
-                for(double currX = startX; currX <=endX; currX = currX + xStep){
+                double endX = 1d;*/
+                double xCoeff = Double.parseDouble(firstEqXCoeffInput.getText());
+                double freeTerm = Double.parseDouble(firstEqFreeTermInput.getText());
+                double startX = Double.parseDouble(firstEqXStartValueInput.getText());
+                double endX = Double.parseDouble(firstEqXEndValueInput.getText());
+                final double xStep = 0.001d;
+                for (double currX = startX; currX <= endX; currX = currX + xStep) {
                     BigDecimal temp = new BigDecimal(currX);
                     xStartTemp.put(temp.setScale(xValuesScale, RoundingMode.HALF_UP), (xCoeff * currX) + freeTerm);
                 }
 
-                xCoeff = 0.066666667d;
+                /*xCoeff = 0.066666667d;
                 freeTerm = 1.2d;
                 startX = 0d;
-                endX = 0.15d;
-                for(double currX = startX; currX <=endX; currX = currX + xStep){
+                endX = 0.15d;*/
+                xCoeff = Double.parseDouble(secondEqXCoeffInput.getText());
+                freeTerm = Double.parseDouble(secondEqFreeTermInput.getText());
+                startX = Double.parseDouble(secondEqXStartValueInput.getText());
+                endX = Double.parseDouble(secondEqXEndValueInput.getText());
+                for (double currX = startX; currX <= endX; currX = currX + xStep) {
                     BigDecimal temp = new BigDecimal(currX);
                     xStartTemp.put(temp.setScale(xValuesScale, RoundingMode.HALF_UP), (xCoeff * currX) + freeTerm);
                 }
 
+                double x0 = Double.parseDouble(x0ValueInput.getText());
+                double xi = Double.parseDouble(xiValueInput.getText());
+
                 log.debug("Start data forming finished");
-                final double timeStep = 0.01d;
+                final double timeStep = 0.0001d;
                 ImplicitFiniteDifferenceMethod implicitFiniteDifferenceMethod = new
-                        ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep, 3.5d, xValuesScale);
+                        ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep, x0, xi, xValuesScale);
                 Map<Double, Map<BigDecimal, Double>> calculatedTemp = implicitFiniteDifferenceMethod.calculate();
 
-
+                JFileChooser fileChooser = new JFileChooser() {
+                    @Override
+                    public void approveSelection() {
+                        File selectedFile = getSelectedFile();
+                        if (selectedFile.exists() && getDialogType() == SAVE_DIALOG) {
+                            int result = JOptionPane.showConfirmDialog(this, "File " + selectedFile.getName() +
+                                    " exist. Overwrite it?", "Overwrite file dialog", JOptionPane.YES_NO_CANCEL_OPTION);
+                            switch (result) {
+                                case JOptionPane.YES_OPTION:
+                                    super.approveSelection();
+                                    return;
+                                case JOptionPane.NO_OPTION:
+                                    return;
+                                case JOptionPane.CANCEL_OPTION:
+                                    super.cancelSelection();
+                                    return;
+                            }
+                        }
+                        super.approveSelection();
+                    }
+                };
+                fileChooser.setFileFilter(new FileNameExtensionFilter("CSV files (*.csv)", "csv"));
+                int result = fileChooser.showSaveDialog(mainFrame);
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    String path = fileChooser.getSelectedFile().getAbsolutePath();
+                    if (!path.toLowerCase().endsWith(".csv")) {
+                        path = path + ".csv";
+                    }
+                    log.debug("Storing data to: " + path);
+                    try {
+                        TimeTemperatureStorer timeTemperatureStorer = new CsvTimeTemperatureStorer(path);
+                        timeTemperatureStorer.store(calculatedTemp);
+                    } catch (IOException e) {
+                        log.error("Exception: " + e, e);
+                        JOptionPane.showMessageDialog(mainFrame, "Error while storing " + e,
+                                "IO Error", JOptionPane.ERROR_MESSAGE);
+                    }
+                    log.debug("Data stored.");
+                    JOptionPane.showMessageDialog(mainFrame, "Temperature calculated and stored to " + path, "Success",
+                            JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
 
@@ -245,8 +313,27 @@ public class MainWindow {
         tempHorPanel.add(secondEqFreeTermInput);
         inputsPanel.add(tempHorPanel);
 
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_RIGID_AREA.getValue()));
+
+        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
+        JLabel x0ValueLabel = new JLabel(X_0_VALUE_LABEL_TEXT);
+        tempHorPanel.add(x0ValueLabel);
+        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
+        tempHorPanel.add(x0ValueInput);
+        inputsPanel.add(tempHorPanel);
+        inputsPanel.add(Box.createRigidArea(StandardDimension.VER_HALF_RIGID_AREA.getValue()));
+
+        tempHorPanel = BoxLayoutUtils.createHorizontalPanel();
+        JLabel xiValueLabel = new JLabel(X_I_VALUE_LABEL_TEXT);
+        tempHorPanel.add(xiValueLabel);
+        tempHorPanel.add(Box.createRigidArea(StandardDimension.HOR_HALF_RIGID_AREA.getValue()));
+        tempHorPanel.add(xiValueInput);
+        inputsPanel.add(tempHorPanel);
+
         GUITools.makeSameSize(firstEqXEndValueLabel, firstEqXCoeffLabel, firstEqFreeTermLabel, firstEqXStartValueLabel,
-                secondEqFreeTermLabel, secondEqXCoeffLabel, secondEqXEndValueLabel, secondEqXStartValueLabel);
+                secondEqFreeTermLabel, secondEqXCoeffLabel, secondEqXEndValueLabel, secondEqXStartValueLabel,
+                x0ValueLabel, xiValueLabel);
 
         return inputsPanel;
     }

@@ -2,6 +2,7 @@ package ua.pp.fland.labs.identif.lab6.model;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import ua.pp.fland.labs.identif.lab6.model.beans.DirectFlowData;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -32,12 +33,15 @@ public class ImplicitFiniteDifferenceMethod {
 
     private final int xValuesScale;
 
+    private final double x0;
+
     public ImplicitFiniteDifferenceMethod(Map<BigDecimal, Double> xStartTemp, double xStep, double timeStep,
-                                          double xi, int xValuesScale) {
+                                          double x0, double xi, int xValuesScale) {
         this.xStartTemp = xStartTemp;
         this.xStep = xStep;
         this.timeStep = timeStep;
         this.xi = xi;
+        this.x0 = x0;
         this.xValuesScale = xValuesScale;
         n = Math.round(Collections.max(xStartTemp.keySet()).doubleValue() / xStep);
     }
@@ -47,14 +51,15 @@ public class ImplicitFiniteDifferenceMethod {
         calculatedTemp = new HashMap<Double, Map<BigDecimal, Double>>();
 
         double startTimeSec = 0d;
-        double currTimeSec = startTimeSec;
-        double endTimeSec = 5d;
-        Map<BigDecimal, Double> timeTemp = new HashMap<BigDecimal, Double>(getTempAtTime(xStartTemp, 1.2f, xi));
+        calculatedTemp.put(startTimeSec, xStartTemp);
+        double currTimeSec = startTimeSec + timeStep;
+        double endTimeSec = 0.05d;
+        Map<BigDecimal, Double> timeTemp = new HashMap<BigDecimal, Double>(getTempAtTime(xStartTemp, x0, xi));
         calculatedTemp.put(currTimeSec, timeTemp);
         currTimeSec = currTimeSec + timeStep;
         for (; currTimeSec < endTimeSec; currTimeSec = currTimeSec + timeStep) {
-            log.debug("Curr time: " + currTimeSec);
-            timeTemp = new HashMap<BigDecimal, Double>(getTempAtTime(timeTemp, 1.2f, xi));
+//            log.debug("Curr time: " + currTimeSec);
+            timeTemp = new HashMap<BigDecimal, Double>(getTempAtTime(timeTemp, x0, xi));
             calculatedTemp.put(currTimeSec, timeTemp);
         }
 
