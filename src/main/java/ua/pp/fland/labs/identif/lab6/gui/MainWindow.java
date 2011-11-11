@@ -61,6 +61,8 @@ public class MainWindow {
     private final JTextField secondEqFreeTermInput;
     private final JTextField x0ValueInput;
     private final JTextField xiValueInput;
+    private final JTextField timeStepInput;
+    private final JTextField endTimeInput;
 
     public MainWindow() {
         mainFrame = new JFrame("Lab 6");
@@ -108,6 +110,14 @@ public class MainWindow {
         xiValueInput = new JTextField("3.5");
         GUITools.fixTextFieldSize(xiValueInput);
         xiValueInput.setCaretPosition(0);
+
+        timeStepInput = new JTextField("0.001");
+        GUITools.fixTextFieldSize(timeStepInput);
+        timeStepInput.setCaretPosition(0);
+
+        endTimeInput = new JTextField("0.1");
+        GUITools.fixTextFieldSize(endTimeInput);
+        endTimeInput.setCaretPosition(0);
 
         final JPanel mainPanel = BoxLayoutUtils.createVerticalPanel();
         mainPanel.setBorder(new EmptyBorder(StandardBordersSizes.MAIN_BORDER.getValue()));
@@ -164,7 +174,8 @@ public class MainWindow {
                 double xi = Double.parseDouble(xiValueInput.getText());
 
                 log.debug("Start data forming finished");
-                final double timeStep = 0.001d;
+                final double timeStep = Double.parseDouble(timeStepInput.getText());
+                final double endTime = Double.parseDouble(endTimeInput.getText());
                 ImplicitFiniteDifferenceMethod implicitFiniteDifferenceMethod = new
                         ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep, x0, xi, xValuesScale);
                 Map<Double, Map<BigDecimal, Double>> calculatedTemp = implicitFiniteDifferenceMethod.calculate();
