@@ -177,7 +177,7 @@ public class MainWindow {
                 final double timeStep = Double.parseDouble(timeStepInput.getText());
                 final double endTime = Double.parseDouble(endTimeInput.getText());
                 ImplicitFiniteDifferenceMethod implicitFiniteDifferenceMethod = new
-                        ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep, x0, xi, xValuesScale);
+                        ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep, endTime, x0, xi, xValuesScale);
                 Map<Double, Map<BigDecimal, Double>> calculatedTemp = implicitFiniteDifferenceMethod.calculate();
 
                 JFileChooser fileChooser = new JFileChooser() {
