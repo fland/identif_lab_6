@@ -33,16 +33,25 @@ public class CsvTimeTemperatureStorer implements TimeTemperatureStorer {
         log.debug("Forming data to store");
         Map<Double, List<Double>> formattedData = new HashMap<Double, List<Double>>(getFormattedData(calculatedTemp));
         log.debug("Formatted data got. Storing...");
-        writer.writeAll(formWriteableList(formattedData));
+        writer.writeAll(formWriteableList(formattedData,
+                new ArrayList<BigDecimal>(calculatedTemp.get(calculatedTemp.keySet().iterator().next()).keySet())));
 
         writer.close();
     }
 
-    private List<String[]> formWriteableList(Map<Double, List<Double>> formattedData) {
+    private List<String[]> formWriteableList(Map<Double, List<Double>> formattedData, List<BigDecimal> xPoses) {
         List<Double> timeStamps = new ArrayList<Double>(formattedData.keySet());
         Collections.sort(timeStamps);
         List<String[]> res = new ArrayList<String[]>();
-        res.add(new String[]{"Time, min", "Temperature, C"});
+
+        Collections.sort(xPoses);
+        String[] xPosesData = new String[1];
+        xPosesData[0] = "Time, sec/Position";
+        for (BigDecimal currPos : xPoses) {
+            xPosesData = (String[]) ArrayUtils.add(xPosesData, currPos.toPlainString());
+        }
+        res.add(xPosesData);
+
         for (double timeStamp : timeStamps) {
             String[] data = new String[1];
             data[0] = String.valueOf(timeStamp);
