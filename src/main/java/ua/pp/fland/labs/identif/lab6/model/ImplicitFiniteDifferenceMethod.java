@@ -37,8 +37,8 @@ public class ImplicitFiniteDifferenceMethod {
 
     private final double endTime;
 
-    public ImplicitFiniteDifferenceMethod(Map<BigDecimal, Double> xStartTemp, double xStep, double endTime, double timeStep,
-                                          double x0, double xi, int xValuesScale) {
+    public ImplicitFiniteDifferenceMethod(Map<BigDecimal, Double> xStartTemp, double xStep, double timeStep,
+                                          double endTime, double x0, double xi, int xValuesScale) {
         this.xStartTemp = xStartTemp;
         this.xStep = xStep;
         this.timeStep = timeStep;

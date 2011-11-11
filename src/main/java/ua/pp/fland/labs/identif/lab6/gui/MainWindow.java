@@ -113,11 +113,11 @@ public class MainWindow {
         GUITools.fixTextFieldSize(xiValueInput);
         xiValueInput.setCaretPosition(0);
 
-        timeStepInput = new JTextField("0.001");
+        timeStepInput = new JTextField("0.0005");
         GUITools.fixTextFieldSize(timeStepInput);
         timeStepInput.setCaretPosition(0);
 
-        endTimeInput = new JTextField("0.1");
+        endTimeInput = new JTextField("0.08");
         GUITools.fixTextFieldSize(endTimeInput);
         endTimeInput.setCaretPosition(0);
 
