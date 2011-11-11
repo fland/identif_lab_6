@@ -13,9 +13,9 @@ import ua.pp.fland.labs.identif.lab6.model.storage.TimeTemperatureStorer;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -164,7 +164,7 @@ public class MainWindow {
                 double xi = Double.parseDouble(xiValueInput.getText());
 
                 log.debug("Start data forming finished");
-                final double timeStep = 0.0001d;
+                final double timeStep = 0.001d;
                 ImplicitFiniteDifferenceMethod implicitFiniteDifferenceMethod = new
                         ImplicitFiniteDifferenceMethod(xStartTemp, xStep, timeStep, x0, xi, xValuesScale);
                 Map<Double, Map<BigDecimal, Double>> calculatedTemp = implicitFiniteDifferenceMethod.calculate();

@@ -53,7 +53,7 @@ public class ImplicitFiniteDifferenceMethod {
         double startTimeSec = 0d;
         calculatedTemp.put(startTimeSec, xStartTemp);
         double currTimeSec = startTimeSec + timeStep;
-        double endTimeSec = 0.05d;
+        double endTimeSec = 0.1d;
         Map<BigDecimal, Double> timeTemp = new HashMap<BigDecimal, Double>(getTempAtTime(xStartTemp, x0, xi));
         calculatedTemp.put(currTimeSec, timeTemp);
         currTimeSec = currTimeSec + timeStep;

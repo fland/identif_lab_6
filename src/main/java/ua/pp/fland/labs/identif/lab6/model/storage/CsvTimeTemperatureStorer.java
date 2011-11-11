@@ -1,6 +1,7 @@
 package ua.pp.fland.labs.identif.lab6.model.storage;
 
 import au.com.bytecode.opencsv.CSVWriter;
+import org.apache.commons.lang.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,14 @@ public class CsvTimeTemperatureStorer implements TimeTemperatureStorer {
         List<String[]> res = new ArrayList<String[]>();
         res.add(new String[]{"Time, min", "Temperature, C"});
         for (double timeStamp : timeStamps) {
-            res.add(new String[]{String.valueOf(timeStamp), String.valueOf(formattedData.get(timeStamp))});
+            String[] data = new String[1];
+            data[0] = String.valueOf(timeStamp);
+
+            for (double value : formattedData.get(timeStamp)) {
+                data = (String[]) ArrayUtils.add(data, String.valueOf(value));
+            }
+
+            res.add(data);
         }
 
         return res;
@@ -63,7 +71,7 @@ public class CsvTimeTemperatureStorer implements TimeTemperatureStorer {
         while (timeStampsIterator.hasNext()) {
             double currTimeStamp = timeStampsIterator.next();
             List<Double> values = new ArrayList<Double>();
-            for(BigDecimal currXPos : xPosValues){
+            for (BigDecimal currXPos : xPosValues) {
                 values.add(calculatedTemp.get(currTimeStamp).get(currXPos));
             }
             formattedData.put(currTimeStamp, values);
