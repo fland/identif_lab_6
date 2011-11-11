@@ -30,7 +30,7 @@ public class CsvTimeTemperatureStorer implements TimeTemperatureStorer {
     @Override
     public void store(Map<Double, Map<BigDecimal, Double>> calculatedTemp) throws IOException {
         log.debug("Forming data to store");
-        Map<BigDecimal, List<Double>> formattedData = new HashMap<BigDecimal, List<Double>>(getFormattedData(calculatedTemp));
+        Map<Double, List<Double>> formattedData = new HashMap<Double, List<Double>>(getFormattedData(calculatedTemp));
         log.debug("Formatted data got. Storing...");
         writer.writeAll(formWriteableList(formattedData));
 
@@ -38,40 +38,35 @@ public class CsvTimeTemperatureStorer implements TimeTemperatureStorer {
     }
 
     private List<String[]> formWriteableList(Map<Double, List<Double>> formattedData) {
-        List<Integer> timeStamps = new ArrayList<Integer>(formattedData.keySet());
+        List<Double> timeStamps = new ArrayList<Double>(formattedData.keySet());
         Collections.sort(timeStamps);
         List<String[]> res = new ArrayList<String[]>();
         res.add(new String[]{"Time, min", "Temperature, C"});
-        for (int timeStamp : timeStamps) {
+        for (double timeStamp : timeStamps) {
             res.add(new String[]{String.valueOf(timeStamp), String.valueOf(formattedData.get(timeStamp))});
         }
 
         return res;
     }
 
-    private Map<BigDecimal, List<Double>> getFormattedData(Map<Double, Map<BigDecimal, Double>> calculatedTemp) {
-        Map<BigDecimal, List<Double>> formattedData = new HashMap<BigDecimal, List<Double>>();
+    private Map<Double, List<Double>> getFormattedData(Map<Double, Map<BigDecimal, Double>> calculatedTemp) {
+        Map<Double, List<Double>> formattedData = new HashMap<Double, List<Double>>();
 
-        List<Integer> timeStamps = new ArrayList<Integer>(timeTemperature.keySet());
+        List<Double> timeStamps = new ArrayList<Double>(calculatedTemp.keySet());
         Collections.sort(timeStamps);
-        Iterator<Integer> timeStampsIterator = timeStamps.iterator();
-        int startTime = timeStampsIterator.next();
-        while (timeStampsIterator.hasNext()) {
-            int endTime = timeStampsIterator.next();
-            if ((endTime - startTime) > timeStepMin) {
-                int endTimeStamp = endTime - startTime;
-                float tempStep = (timeTemperature.get(endTime) - timeTemperature.get(startTime)) /
-                        (endTime - startTime);
-                for (int i = 0; i <= endTimeStamp; i++) {
-                    formattedData.put(i + startTime, (timeTemperature.get(startTime) + tempStep * i));
-                }
+        Iterator<Double> timeStampsIterator = timeStamps.iterator();
 
-                startTime = endTime;
-            } else if ((endTime - startTime) == timeStepMin) {
-                formattedData.put(startTime, timeTemperature.get(startTime));
-                formattedData.put(endTime, timeTemperature.get(endTime));
-                startTime = endTime;
+        List<BigDecimal> xPosValues = new ArrayList<BigDecimal>(calculatedTemp.get(calculatedTemp.keySet().iterator().next()).keySet());
+        Collections.sort(xPosValues);
+        Iterator<BigDecimal> xPosValuesIterator = xPosValues.iterator();
+
+        while (timeStampsIterator.hasNext()) {
+            double currTimeStamp = timeStampsIterator.next();
+            List<Double> values = new ArrayList<Double>();
+            for(BigDecimal currXPos : xPosValues){
+                values.add(calculatedTemp.get(currTimeStamp).get(currXPos));
             }
+            formattedData.put(currTimeStamp, values);
         }
         log.debug("Reached end of timeTemperature data");
 
